@@ -17,7 +17,7 @@ type usecase struct {
 func (u *usecase) IncreaseBalance(user_id string, balanc_id string, amount int) error{
 	err := u.gateway.IncreaseBalance(user_id, balanc_id, amount)
 	if err != nil {
-		return fmt.Errorf("%v", err)
+		return fmt.Errorf("%v", "Bad request")
 	}
 	return nil
 }
@@ -25,7 +25,7 @@ func (u *usecase) IncreaseBalance(user_id string, balanc_id string, amount int) 
 func (u *usecase) DecreaseBalance(user_id string, balanc_id string, amount int) error{
 	err := u.gateway.DecreaseBalance(user_id, balanc_id, amount)
 	if err != nil {
-		return fmt.Errorf("%v", "Insufficient funds")
+		return fmt.Errorf("%v", "Bad request")
 	}
 	return nil
 }

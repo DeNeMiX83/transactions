@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+    _ "github.com/lib/pq"
 )
 
 type DbConnect struct {

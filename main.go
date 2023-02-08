@@ -5,7 +5,6 @@ import (
 	"fmt"
     "github.com/joho/godotenv"
     "log"
-	_ "github.com/lib/pq"
 )
 
 func init() {

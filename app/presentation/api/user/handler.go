@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"github.com/julienschmidt/httprouter"
 )
 
 type Request struct {
@@ -14,15 +15,20 @@ type Request struct {
 	Amount int `json:"amount"`
 }
 
-type Handler struct {
+type handler struct {
 	uc user.UserUseCase
 }
 
-func NewHandler(uc user.UserUseCase) *Handler {
-	return &Handler{uc: uc}
+func NewHandler(uc user.UserUseCase) *handler {
+	return &handler{uc: uc}
 }
 
-func (h *Handler) IncreaseBalance(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Register(router *httprouter.Router) {
+	router.POST("/user/balance/increase", h.IncreaseBalance)
+	router.POST("/user/balance/decrease", h.DecreaseBalance)
+}
+
+func (h *handler) IncreaseBalance(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	resp := make(map[string]string)
 
@@ -39,16 +45,15 @@ func (h *Handler) IncreaseBalance(w http.ResponseWriter, r *http.Request) {
 	
 	err = h.uc.IncreaseBalance(user_id, balanc_id, amount)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		resp["error"] = err.Error()
-		json.NewEncoder(w).Encode(resp)
-		return
+	} else {
+		resp["message"] = "success"
 	}
-
-	resp["message"] = "success"
 	json.NewEncoder(w).Encode(resp)
 }
 
-func (h *Handler) DecreaseBalance(w http.ResponseWriter, r *http.Request) {
+func (h *handler) DecreaseBalance(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	resp := make(map[string]string)
 
@@ -67,11 +72,10 @@ func (h *Handler) DecreaseBalance(w http.ResponseWriter, r *http.Request) {
 
 	err = h.uc.DecreaseBalance(user_id, balanc_id, amount)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		resp["error"] = err.Error()
-		json.NewEncoder(w).Encode(resp)
-		return
+	} else {
+		resp["message"] = "success"
 	}
-
-	resp["message"] = "success"
 	json.NewEncoder(w).Encode(resp)
 }
